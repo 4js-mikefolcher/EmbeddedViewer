@@ -1,0 +1,65 @@
+LAYOUT
+	VBOX
+		GRID
+{
+["Output Type: "][fld001                             ][btn001   ]
+}
+		END --GRID
+		HBOX
+			GRID docviewer_grid
+{
+[wc001                                                           ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+}
+			END --GRID
+			GRID htmlviewer_grid (HIDDEN)
+{
+[wc002                                                           ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+}
+			END --GRID
+			GRID url_grid (HIDDEN)
+{
+[wc003                                                           ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+}
+			END --GRID
+		END --HBOX
+	END --VBOX
+END --LAYOUT
+
+ATTRIBUTES
+
+	COMBOBOX fld001 = formonly.output_type;
+	BUTTON btn001 : run_report, TEXT="Generate Report";
+
+	--Web Components
+	WEBCOMPONENT wc001 = formonly.docviewer, COMPONENTTYPE="docviewer", STRETCH=BOTH;
+	WEBCOMPONENT wc002 = formonly.htmlviewer, COMPONENTTYPE="htmlviewer", STRETCH=BOTH;
+	WEBCOMPONENT wc003 = formonly.urlviewer, STRETCH=BOTH;
+
+END --ATTRIBUTES

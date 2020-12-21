@@ -1,0 +1,30 @@
+LAYOUT
+	VBOX
+		GRID
+{
+["Press to load the video: "][btn001   ]
+}
+		END --GRID
+		GRID videoviewer_grid (HIDDEN)
+{
+[wc001                                                           ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+[                                                                ]
+}
+		END --GRID
+	END --VBOX
+END --LAYOUT
+
+ATTRIBUTES
+
+	BUTTON btn001 : load_video, TEXT="Load Video";
+	WEBCOMPONENT wc001 = formonly.videoviewer, COMPONENTTYPE="videoviewer", STRETCH=BOTH;
+
+END --ATTRIBUTES
