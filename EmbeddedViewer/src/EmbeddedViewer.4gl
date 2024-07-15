@@ -6,6 +6,7 @@
 #+
 IMPORT os
 IMPORT util
+IMPORT security
 
 #+ Embedded Viewer Record
 #+
@@ -19,6 +20,7 @@ IMPORT util
 PUBLIC TYPE TEmbeddedViewer RECORD
 	fileUrl STRING,
 	mimeType STRING,
+	fileData STRING,
 	eleHeight INTEGER,
 	eleWidth INTEGER
 END RECORD
@@ -40,8 +42,8 @@ PRIVATE DEFINE filecache DICTIONARY OF STRING
 #+
 PUBLIC FUNCTION (self TEmbeddedViewer) init(filename STRING)
 
-	CALL self.setFileUrl(filename)
 	CALL self.setMimeType(filename)
+	CALL self.setFileUrl(filename)
 	LET self.eleHeight = 0
 	LET self.eleWidth = 0
 
@@ -109,19 +111,49 @@ PRIVATE FUNCTION (self TEmbeddedViewer) setFileUrl(filename STRING) RETURNS ()
 	IF filecache.contains(filename) THEN
 		LET self.fileUrl = filecache[filename]
 	ELSE
-		LET gas_private_filepath= SFMT("%1%2%3",
-			FGL_GETENV("FGL_PRIVATE_DIR"),
-			os.Path.separator(),
-			os.Path.baseName(filename))
-		IF os.Path.copy(filename, gas_private_filepath) THEN
-			LET self.fileUrl = SFMT("%1/%2",
-				FGL_GETENV("FGL_PRIVATE_URL_PREFIX"),
-				os.Path.baseName(gas_private_filepath))
-			LET filecache[filename] = self.fileUrl
+		LET gas_private_filepath = FGL_GETENV("FGL_PRIVATE_DIR")
+		IF gas_private_filepath IS NULL THEN
+			CALL self.setFileData(filename)
+		ELSE
+			LET gas_private_filepath = SFMT("%1%2%3",
+				gas_private_filepath,
+				os.Path.separator(),
+				os.Path.baseName(filename))
+			IF os.Path.copy(filename, gas_private_filepath) THEN
+				LET self.fileUrl = SFMT("%1/%2",
+					FGL_GETENV("FGL_PRIVATE_URL_PREFIX"),
+					os.Path.baseName(gas_private_filepath))
+				LET filecache[filename] = self.fileUrl
+			END IF
 		END IF
 	END IF
 
 END FUNCTION #setFileUrl
+
+#+ Sets the File Data (Base 64) of the TEmbeddedViewer Record
+#+
+#+ This function sets the fileData field of the TEmbeddedViewer record.  It
+#+ takes the file and, base 64 encodes it, and sets the fileData field.
+#+
+#+ @code
+#+	CALL self.setFileData(filename)
+#+
+#+ @param filename File name to view in the embedded viewer
+#+
+PRIVATE FUNCTION (self TEmbeddedViewer) setFileData(filename STRING) RETURNS ()
+
+	VAR byteData BYTE
+	LOCATE byteData IN MEMORY
+	CALL byteData.readFile(filename)
+	LET self.fileData = security.Base64.FromByte(byteData)
+	FREE byteData
+
+	LET self.fileUrl = NULL
+	IF self.mimeType IS NOT NULL THEN
+		LET self.fileData = SFMT("data:%1;base64,%2", self.mimeType, self.fileData)
+	END IF
+
+END FUNCTION #setFileData
 
 #+ Builds Mime-type Dictionary
 #+

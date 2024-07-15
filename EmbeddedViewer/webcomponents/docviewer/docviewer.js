@@ -15,6 +15,9 @@ var onICHostReady = function(version) {
 			if (attribs.fileUrl) {
 				viewer.data = attribs.fileUrl;
 			}
+			if (attribs.fileData) {
+				viewer.data = attribs.fileData;
+			}
 			if (attribs.mimeType) {
 				viewer.type = attribs.mimeType;
 			}
